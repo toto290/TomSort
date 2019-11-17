@@ -10,8 +10,10 @@ class MainApplication(tk.Tk):
         # initial parameters
         self.mode = tk.IntVar()
         self.mode.set(0)    # start:0 sort:1 twin:2
-        self.width = 500
-        self.height = 500
+        self.state('zoomed')
+        self.update_idletasks()
+        self.width = self.winfo_width()
+        self.height = self.winfo_height()
         self.geometry('{}x{}'.format(str(self.width), str(self.height)))
         self.title(title)
         self.update_idletasks()
@@ -19,9 +21,9 @@ class MainApplication(tk.Tk):
         # GUI creation
         self.menu = Menu(self)
         self.status = Status(self)
-        self.frame_start = FrameModeStart(self, width=self.width, height=self.height)
-        self.frame_sort = FrameModeSort(self, width=self.width, height=self.height)
-        self.frame_twin = FrameModeTwin(self, width=self.width, height=self.height)
+        self.frame_start = FrameModeStart(self, width=self.width, height=self.height, bg=colourdict[3])
+        self.frame_sort = FrameModeSort(self, width=self.width, height=self.height, bg=colourdict[3])
+        self.frame_twin = FrameModeTwin(self, width=self.width, height=self.height, bg=colourdict[3])
         self.mode_dict = {0: ('Start', self.frame_start), 1: ('Sort', self.frame_sort), 2: ('Twin', self.frame_twin)}
 
         # GUI initialization
@@ -52,29 +54,54 @@ class MainApplication(tk.Tk):
 
 class FrameModeStart(tk.Frame):
     def __init__(self, root, **kwargs):
-        print('init: Start-Mode Frame')
         tk.Frame.__init__(self, root, **kwargs)
+        print('init: Start-Mode Frame')
         self.root = root
 
 
 class FrameModeSort(tk.Frame):
     def __init__(self, root, **kwargs):
-        print('init: Sort-Mode Frame')
         tk.Frame.__init__(self, root, **kwargs)
+        print('init: Sort-Mode Frame')
         self.root = root
-        self.left_frame = tk.Frame(self, bg='blue', height=int(1 * self.root.height), width=int(0.7 * self.root.width))
-        self.right_frame = tk.Frame(self, bg='red', height=int(1 * self.root.height), width=int(0.3 * self.root.width))
-        self.left_frame.pack(side='left', expand='1')
-        self.right_frame.pack(side='right', expand='1')
+        self.pad = 20
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, minsize=500)
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(3, minsize=60)
+
+        self.c_photo = tk.Frame(self)
+        self.c_photo.grid(row=0, column=0, rowspan=3, sticky='nsew')
+        self.c_photo.configure(bg='white', bd=5, relief='groove')
+        self.photoframe = tk.Label(self.c_photo, text="hier könnte ihr foto stehen")
+        self.photoframe.pack(fill='both', expand=True)
+
+        self.c_quickfuns = tk.Frame(self)
+        self.c_quickfuns.grid(row=3, column=0)
+
+        # workpath
+        self.c_workpath = tk.Frame(self)
+        self.c_workpath.grid(row=0, column=1, sticky='nwe', pady=self.pad, padx=self.pad)
+        self.workpath_label = tk.Label(self.c_workpath, text='//dies/ist/ein/Beispielpfad', relief='sunken')
+        self.workpath_button = tk.Button(self.c_workpath, text='change work folder')
+        self.workpath_label.pack(side='left', expand=True)
+        self.workpath_button.pack(side='right')
+
+        self.c_metadata = tk.Frame(self)
+        self.c_metadata.grid(row=1, column=1)
+
+        self.c_tags = tk.Frame(self)
+        self.c_tags.grid(row=2, column=1)
+
+        self.c_newtag = tk.Frame(self)
+        self.c_newtag.grid(row=3, column=1)
 
 
 class FrameModeTwin(tk.Frame):
-    def __init__(self, parent, width, height):
+    def __init__(self, root, **kwargs):
         print('init: Twin-Mode Frame')
-        tk.Frame.__init__(self, parent, width=width, height=height)
-        self.root = parent
-        left_frame = tk.Frame(self, bg='green', height=600, width=600)
-        right_frame = tk.Frame(self, bg='yellow', height=600, width=600)
+        tk.Frame.__init__(self, root, **kwargs)
+        self.root = root
 
 
 class Menu(tk.Frame):
@@ -89,6 +116,7 @@ class Menu(tk.Frame):
 
         self.submenu_modes = tk.Menu(self.menu, tearoff=False)
         self.menu.add_cascade(label='Modes', menu=self.submenu_modes)
+
         self.submenu_modes.add_command(label='Sort Photos', command=lambda: self.root.switch_mode(1))
         self.submenu_modes.add_command(label='Find Twins', command=lambda: self.root.switch_mode(2))
 
@@ -103,6 +131,8 @@ class Status(tk.Frame):
         self.status.pack(side='bottom', fill='x')
 
 
+# Program
+colourdict = {0: '#FFFFFF', 1: '#354668', 2: '#27334A', 3: '#1C2536', 4: '#121926', 5: '#0B0F17'}
 if __name__ == '__main__':
     app = MainApplication('TomSort')
     app.mainloop()
