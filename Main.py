@@ -1,6 +1,9 @@
 import tkinter as tk
+import tkinter.filedialog
 import os
+import datetime
 from pathlib import Path
+from PIL import Image
 
 
 class MainApplication(tk.Tk):
@@ -17,6 +20,9 @@ class MainApplication(tk.Tk):
         self.geometry('{}x{}'.format(str(self.width), str(self.height)))
         self.title(title)
         self.update_idletasks()
+
+        # init logic modules
+        self.photosort = PhotoSort()
 
         # GUI creation
         self.menu = Menu(self)
@@ -47,7 +53,7 @@ class MainApplication(tk.Tk):
     def resize(self):
         self.width = self.winfo_width()
         self.height = self.winfo_height()
-        print('Resize: ' + str(self.width) + 'x' + str(self.height))
+        #print('Resize: ' + str(self.width) + 'x' + str(self.height))
         self.currentframe.config(width=self.width, height=self.height)
         self.update_idletasks()
 
@@ -79,14 +85,16 @@ class FrameModeSort(tk.Frame):
         self.c_quickfuns = tk.Frame(self)
         self.c_quickfuns.grid(row=3, column=0)
 
-        # workpath
+        # work path
         self.c_workpath = tk.Frame(self)
         self.c_workpath.grid(row=0, column=1, sticky='nwe', pady=self.pad, padx=self.pad)
-        self.workpath_label = tk.Label(self.c_workpath, text='//dies/ist/ein/Beispielpfad', relief='sunken')
-        self.workpath_button = tk.Button(self.c_workpath, text='change work folder')
+        self.workpath_label = tk.Label(self.c_workpath, text=self.root.photosort.workfolder, relief='sunken')
+        self.workpath_button = tk.Button(self.c_workpath, text='change')
         self.workpath_label.pack(side='left', expand=True)
         self.workpath_button.pack(side='right')
+        self.workpath_button.bind('<Button-1>', lambda e: self.button_workpath())
 
+        # meta data
         self.c_metadata = tk.Frame(self)
         self.c_metadata.grid(row=1, column=1)
 
@@ -95,6 +103,10 @@ class FrameModeSort(tk.Frame):
 
         self.c_newtag = tk.Frame(self)
         self.c_newtag.grid(row=3, column=1)
+
+    def button_workpath(self):
+        self.root.photosort.set_workfolder(tk.filedialog.askdirectory())
+        self.workpath_label.configure(text=self.root.photosort.get_workfolder())
 
 
 class FrameModeTwin(tk.Frame):
@@ -131,8 +143,48 @@ class Status(tk.Frame):
         self.status.pack(side='bottom', fill='x')
 
 
-# Program
+# ===== Logic Modules =====
+class PhotoSort:
+    def __init__(self):
+        self.workfolder = Path("empty")
+        self.validfiles = validfototypes
+        self.photos = []
+
+    def set_workfolder(self, wf):
+        self.workfolder = Path(wf)
+        print("PhotoSort: workfolder changed to " + wf)
+        self.scan_folder()
+
+    def get_workfolder(self):
+        return str(self.workfolder)
+
+    def scan_folder(self):
+        files = os.listdir(self.workfolder)
+        photolist = []
+        for img_name in files:
+            if os.path.splitext(img_name)[1] in self.validfiles:
+                photolist.append(Photo(img_name))
+            else:
+                files.remove(img_name)
+        self.photos = photolist
+
+
+class Photo:
+    def __init__(self, img):
+        self.oldname = img
+        self.path = Path.joinpath(app.photosort.workfolder, self.oldname)
+        self.date = datetime.datetime.fromtimestamp(self.path.stat().st_mtime)
+        self.tags = []
+        im = Image.open(self.path)
+        self.x, self.y = im.size
+        self.reso = '{}x{}'.format(self.x, self.y)
+
+
+# ===== Global Vars =====
 colourdict = {0: '#FFFFFF', 1: '#354668', 2: '#27334A', 3: '#1C2536', 4: '#121926', 5: '#0B0F17'}
+validfototypes = ['.jpg', '.JPG', '.png', '.PNG']
+
+# ===== Program =====
 if __name__ == '__main__':
     app = MainApplication('TomSort')
     app.mainloop()

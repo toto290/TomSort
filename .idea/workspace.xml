@@ -135,7 +135,14 @@
       <option name="project" value="LOCAL" />
       <updated>1573940363668</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="basic layout and first elements in sortmode window added">
+      <created>1573960756981</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1573960756981</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -167,6 +174,7 @@
     <MESSAGE value="added funcionality to switch between working modes&#10;includes working visualization" />
     <MESSAGE value="restructured the frame architecture by adding new Frame Subclasses" />
     <MESSAGE value="reworked GUI for cleaner and slimmer design" />
-    <option name="LAST_COMMIT_MESSAGE" value="reworked GUI for cleaner and slimmer design" />
+    <MESSAGE value="basic layout and first elements in sortmode window added" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic layout and first elements in sortmode window added" />
   </component>
 </project>
