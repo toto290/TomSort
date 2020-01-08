@@ -3,7 +3,7 @@ import tkinter.filedialog
 import os
 import datetime
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageTk
 
 
 class MainApplication(tk.Tk):
@@ -79,8 +79,11 @@ class FrameModeSort(tk.Frame):
         self.c_photo = tk.Frame(self)
         self.c_photo.grid(row=0, column=0, rowspan=3, sticky='nsew')
         self.c_photo.configure(bg='white', bd=5, relief='groove')
-        self.photoframe = tk.Label(self.c_photo, text="hier könnte ihr foto stehen")
-        self.photoframe.pack(fill='both', expand=True)
+        image = Image.open(Path.joinpath(path_images, "girl_with_camera.png"))
+        self.current_image = ImageTk.PhotoImage(image.resize((300, 200), Image.ANTIALIAS))
+        self.photoframe = tk.Label(self.c_photo, image=self.current_image)
+        self.photoframe.image = self.current_image
+        self.photoframe.pack(fill='both', expand=1)
 
         self.c_quickfuns = tk.Frame(self)
         self.c_quickfuns.grid(row=3, column=0)
@@ -107,6 +110,13 @@ class FrameModeSort(tk.Frame):
     def button_workpath(self):
         self.root.photosort.set_workfolder(tk.filedialog.askdirectory())
         self.workpath_label.configure(text=self.root.photosort.get_workfolder())
+
+    def get_resized_image(self, image, widget):
+        x_i, y_i = image.size
+        x_w, y_w = widget.winfo_width(), widget.winfo_height()
+        ratio_i = x_i/y_i
+        ratio_w = x_w/y_w
+        if(ratio_i >= r):
 
 
 class FrameModeTwin(tk.Frame):
@@ -167,6 +177,14 @@ class PhotoSort:
             else:
                 files.remove(img_name)
         self.photos = photolist
+        self.print_photo_overview(0)
+
+    def print_photo_overview(self, n):
+        print("name: " + str(self.photos[n].oldname))
+        print("path: " + str(self.photos[n].path))
+        print("date: " + str(self.photos[n].date))
+        print("tags: " + str(self.photos[n].tags))
+        print("reso: " + str(self.photos[n].reso))
 
 
 class Photo:
@@ -183,6 +201,7 @@ class Photo:
 # ===== Global Vars =====
 colourdict = {0: '#FFFFFF', 1: '#354668', 2: '#27334A', 3: '#1C2536', 4: '#121926', 5: '#0B0F17'}
 validfototypes = ['.jpg', '.JPG', '.png', '.PNG']
+path_images = Path(r"C:\Users\tomod\OneDrive\06 Programmierung\01 Python\01 Projekte\TomSort\images")
 
 # ===== Program =====
 if __name__ == '__main__':
