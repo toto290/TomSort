@@ -20,9 +20,10 @@ class MainApplication(tk.Tk):
         self.geometry('{}x{}'.format(str(self.width), str(self.height)))
         self.title(title)
         self.update_idletasks()
+        #self.resizable(0, 0)
 
         # init logic modules
-        self.photosort = PhotoSort()
+        self.photosort = PhotoSort(self)
 
         # GUI creation
         self.menu = Menu(self)
@@ -37,9 +38,16 @@ class MainApplication(tk.Tk):
         self.status.statustext.set(self.mode_dict[0][0] + '-Mode')
         self.currentframe.pack()
         self.update_idletasks()
+        self.resize()
 
         # Binds
-        self.bind("<Configure>", lambda e: self.resize())
+        #self.bind("<Configure>", lambda e: self.configuration_happened(True))
+        #self.bind('<ButtonRelease-1>', lambda e: self.resize())
+
+    #def configuration_happened(self, val):
+     #   print("XXX")
+      #  print(self.configured)
+       # self.configured = val
 
     def switch_mode(self, num):
         print('Switch mode: ' + self.mode_dict[num][0] + '(' + str(num) + ')')
@@ -49,13 +57,15 @@ class MainApplication(tk.Tk):
         self.mode_dict[num][1].pack(side="bottom", fill="both", expand=True)
         self.update_idletasks()
         self.currentframe = self.mode_dict[num][1]
+        self.currentframe.resize()
 
     def resize(self):
+        print("resizing")
         self.width = self.winfo_width()
         self.height = self.winfo_height()
         #print('Resize: ' + str(self.width) + 'x' + str(self.height))
         self.currentframe.config(width=self.width, height=self.height)
-        self.update_idletasks()
+        self.currentframe.resize()
 
 
 class FrameModeStart(tk.Frame):
@@ -63,6 +73,9 @@ class FrameModeStart(tk.Frame):
         tk.Frame.__init__(self, root, **kwargs)
         print('init: Start-Mode Frame')
         self.root = root
+
+    def resize(self):
+        pass
 
 
 class FrameModeSort(tk.Frame):
@@ -79,10 +92,9 @@ class FrameModeSort(tk.Frame):
         self.c_photo = tk.Frame(self)
         self.c_photo.grid(row=0, column=0, rowspan=3, sticky='nsew')
         self.c_photo.configure(bg='white', bd=5, relief='groove')
-        image = Image.open(Path.joinpath(path_images, "girl_with_camera.png"))
-        self.current_image = ImageTk.PhotoImage(image.resize((300, 200), Image.ANTIALIAS))
-        self.photoframe = tk.Label(self.c_photo, image=self.current_image)
-        self.photoframe.image = self.current_image
+        self.photoframe = tk.Label(self.c_photo)
+        self.current_image_original = Image.open(Path.joinpath(path_images, "girl_with_camera.png"))
+        self.resize()
         self.photoframe.pack(fill='both', expand=1)
 
         self.c_quickfuns = tk.Frame(self)
@@ -111,19 +123,23 @@ class FrameModeSort(tk.Frame):
         self.root.photosort.set_workfolder(tk.filedialog.askdirectory())
         self.workpath_label.configure(text=self.root.photosort.get_workfolder())
 
-    def get_resized_image(self, image, widget):
-        x_i, y_i = image.size
-        x_w, y_w = widget.winfo_width(), widget.winfo_height()
-        ratio_i = x_i/y_i
-        ratio_w = x_w/y_w
-        if(ratio_i >= r):
+    def resize(self):
+        self.current_image_resized = get_resized_image(self, self.current_image_original, self.c_photo)
+        self.current_photoimage = ImageTk.PhotoImage(self.current_image_resized)
+        self.photoframe.config(image=self.current_photoimage)
 
+    def set_new_image(self, image):
+        self.current_image_original = image
+        self.resize()
 
 class FrameModeTwin(tk.Frame):
     def __init__(self, root, **kwargs):
         print('init: Twin-Mode Frame')
         tk.Frame.__init__(self, root, **kwargs)
         self.root = root
+
+    def resize(self):
+        pass
 
 
 class Menu(tk.Frame):
@@ -155,7 +171,8 @@ class Status(tk.Frame):
 
 # ===== Logic Modules =====
 class PhotoSort:
-    def __init__(self):
+    def __init__(self, root):
+        self.root = root
         self.workfolder = Path("empty")
         self.validfiles = validfototypes
         self.photos = []
@@ -178,6 +195,7 @@ class PhotoSort:
                 files.remove(img_name)
         self.photos = photolist
         self.print_photo_overview(0)
+        self.set_current_image(0)
 
     def print_photo_overview(self, n):
         print("name: " + str(self.photos[n].oldname))
@@ -185,6 +203,10 @@ class PhotoSort:
         print("date: " + str(self.photos[n].date))
         print("tags: " + str(self.photos[n].tags))
         print("reso: " + str(self.photos[n].reso))
+
+    def set_current_image(self, n):
+        image = Image.open(Path.joinpath(self.workfolder, self.photos[n].oldname))
+        self.root.frame_sort.set_new_image(image)
 
 
 class Photo:
@@ -196,6 +218,19 @@ class Photo:
         im = Image.open(self.path)
         self.x, self.y = im.size
         self.reso = '{}x{}'.format(self.x, self.y)
+
+
+# ===== Static Functions =====
+def get_resized_image(self, image, widget):
+    x_i, y_i = image.size
+    x_w, y_w = widget.winfo_width(), widget.winfo_height()
+    ratio_i = x_i/y_i
+    ratio_w = x_w/y_w
+    if ratio_i >= ratio_w:
+        img = image.resize((x_w, int(x_w/ratio_i)+1), Image.ANTIALIAS)
+    else:
+        img = image.resize((int(y_w*ratio_i), y_w), Image.ANTIALIAS)
+    return img
 
 
 # ===== Global Vars =====

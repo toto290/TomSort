@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="81df7d1a-6f9a-4e57-812e-03cb76aad3f0" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/images/girl_with_camera.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
     </list>
@@ -150,7 +149,14 @@
       <option name="project" value="LOCAL" />
       <updated>1574032274161</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="added first photo display">
+      <created>1578525866855</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1578525866855</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.History.Properties">
@@ -184,6 +190,7 @@
     <MESSAGE value="reworked GUI for cleaner and slimmer design" />
     <MESSAGE value="basic layout and first elements in sortmode window added" />
     <MESSAGE value="added functionality to workpath elements&#10;added phosort-logic class&#10;added functionality to select and scan working folder&#10;added functionality to access image meta data" />
-    <option name="LAST_COMMIT_MESSAGE" value="added functionality to workpath elements&#10;added phosort-logic class&#10;added functionality to select and scan working folder&#10;added functionality to access image meta data" />
+    <MESSAGE value="added first photo display" />
+    <option name="LAST_COMMIT_MESSAGE" value="added first photo display" />
   </component>
 </project>
