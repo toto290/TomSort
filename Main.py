@@ -22,9 +22,6 @@ class MainApplication(tk.Tk):
         self.update_idletasks()
         #self.resizable(0, 0)
 
-        # init logic modules
-        self.photosort = PhotoSort(self)
-
         # GUI creation
         self.menu = Menu(self)
         self.status = Status(self)
@@ -50,7 +47,6 @@ class MainApplication(tk.Tk):
        # self.configured = val
 
     def switch_mode(self, num):
-        print('Switch mode: ' + self.mode_dict[num][0] + '(' + str(num) + ')')
         self.mode.set(num)
         self.status.statustext.set(self.mode_dict[num][0] + '-Mode')
         self.currentframe.pack_forget()
@@ -60,7 +56,6 @@ class MainApplication(tk.Tk):
         self.currentframe.resize()
 
     def resize(self):
-        print("resizing")
         self.width = self.winfo_width()
         self.height = self.winfo_height()
         #print('Resize: ' + str(self.width) + 'x' + str(self.height))
@@ -71,7 +66,6 @@ class MainApplication(tk.Tk):
 class FrameModeStart(tk.Frame):
     def __init__(self, root, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
-        print('init: Start-Mode Frame')
         self.root = root
 
     def resize(self):
@@ -81,7 +75,7 @@ class FrameModeStart(tk.Frame):
 class FrameModeSort(tk.Frame):
     def __init__(self, root, **kwargs):
         tk.Frame.__init__(self, root, **kwargs)
-        print('init: Sort-Mode Frame')
+        self.photosort = PhotoSort(self)
         self.root = root
         self.pad = 20
         self.columnconfigure(0, weight=1)
@@ -97,13 +91,20 @@ class FrameModeSort(tk.Frame):
         self.resize()
         self.photoframe.pack(fill='both', expand=1)
 
+        # quickfuns
         self.c_quickfuns = tk.Frame(self)
         self.c_quickfuns.grid(row=3, column=0)
+        self.quickfuns_button_next = tk.Button(self.c_quickfuns, text='Next')
+        self.quickfuns_button_last = tk.Button(self.c_quickfuns, text='Previous')
+        self.quickfuns_button_next.pack(expand=True)
+        self.quickfuns_button_last.pack(expand=True)
+        self.quickfuns_button_next.bind('<Button-1>', lambda e: self.button_quickfuns_next_last("next"))
+        self.quickfuns_button_last.bind('<Button-1>', lambda e: self.button_quickfuns_next_last("last"))
 
         # work path
         self.c_workpath = tk.Frame(self)
         self.c_workpath.grid(row=0, column=1, sticky='nwe', pady=self.pad, padx=self.pad)
-        self.workpath_label = tk.Label(self.c_workpath, text=self.root.photosort.workfolder, relief='sunken')
+        self.workpath_label = tk.Label(self.c_workpath, text=self.photosort.workfolder, relief='sunken')
         self.workpath_button = tk.Button(self.c_workpath, text='change')
         self.workpath_label.pack(side='left', expand=True)
         self.workpath_button.pack(side='right')
@@ -120,8 +121,14 @@ class FrameModeSort(tk.Frame):
         self.c_newtag.grid(row=3, column=1)
 
     def button_workpath(self):
-        self.root.photosort.set_workfolder(tk.filedialog.askdirectory())
-        self.workpath_label.configure(text=self.root.photosort.get_workfolder())
+        self.photosort.set_workfolder(tk.filedialog.askdirectory())
+        self.workpath_label.configure(text=self.photosort.get_workfolder())
+
+    def button_quickfuns_next_last(self, cmd):
+        if cmd == "next":
+            self.photosort.shift_current_image(1)
+        elif cmd == "last":
+            self.photosort.shift_current_image(-1)
 
     def resize(self):
         self.current_image_resized = get_resized_image(self, self.current_image_original, self.c_photo)
@@ -132,9 +139,9 @@ class FrameModeSort(tk.Frame):
         self.current_image_original = image
         self.resize()
 
+
 class FrameModeTwin(tk.Frame):
     def __init__(self, root, **kwargs):
-        print('init: Twin-Mode Frame')
         tk.Frame.__init__(self, root, **kwargs)
         self.root = root
 
@@ -176,6 +183,7 @@ class PhotoSort:
         self.workfolder = Path("empty")
         self.validfiles = validfototypes
         self.photos = []
+        self.n = 0
 
     def set_workfolder(self, wf):
         self.workfolder = Path(wf)
@@ -186,16 +194,16 @@ class PhotoSort:
         return str(self.workfolder)
 
     def scan_folder(self):
+        self.n = 0
         files = os.listdir(self.workfolder)
+        print("files:" + str(files))
         photolist = []
         for img_name in files:
             if os.path.splitext(img_name)[1] in self.validfiles:
                 photolist.append(Photo(img_name))
-            else:
-                files.remove(img_name)
         self.photos = photolist
-        self.print_photo_overview(0)
-        self.set_current_image(0)
+        #self.print_photo_overview(self.n)
+        self.set_current_image(self.n)
 
     def print_photo_overview(self, n):
         print("name: " + str(self.photos[n].oldname))
@@ -206,13 +214,24 @@ class PhotoSort:
 
     def set_current_image(self, n):
         image = Image.open(Path.joinpath(self.workfolder, self.photos[n].oldname))
-        self.root.frame_sort.set_new_image(image)
+        self.root.set_new_image(image)
+
+    def shift_current_image(self, dn):
+        print(self.photos)
+        new_n = self.n + dn
+        if new_n < 0:
+            self.n = len(self.photos)-1
+        elif new_n > len(self.photos)-1:
+            self.n = 0
+        else:
+            self.n += dn
+        self.set_current_image(self.n)
 
 
 class Photo:
     def __init__(self, img):
         self.oldname = img
-        self.path = Path.joinpath(app.photosort.workfolder, self.oldname)
+        self.path = Path.joinpath(app.frame_sort.photosort.workfolder, self.oldname)
         self.date = datetime.datetime.fromtimestamp(self.path.stat().st_mtime)
         self.tags = []
         im = Image.open(self.path)
