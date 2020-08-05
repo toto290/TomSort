@@ -2,10 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="81df7d1a-6f9a-4e57-812e-03cb76aad3f0" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/FotoSort.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/FotoSort.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,23 +24,17 @@
     <option name="UPDATE_TYPE" value="MERGE" />
   </component>
   <component name="ProjectId" id="1SfYR9J5oI2OCARuK0UKrOG8x33" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager">
     <configuration name="Main" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -49,9 +44,9 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\tomod\.conda\envs\beamerprojection\python.exe" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="true" />
+      <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Main.py" />
@@ -203,13 +198,12 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="COLUMN_ORDER" />
-            </State>
+            <State />
           </value>
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="test git/github functionality" />
@@ -224,5 +218,31 @@
     <MESSAGE value="added arrowkey based image scrolling&#10;added (buggy) &quot;rotate&quot; button" />
     <MESSAGE value="tidied up the code&#10;implemented first metadata displays" />
     <option name="LAST_COMMIT_MESSAGE" value="tidied up the code&#10;implemented first metadata displays" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="1899" height="283" key="GridCell.Tab.0.bottom" timestamp="1596662161977">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="283" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1596662161977" />
+    <state width="1899" height="283" key="GridCell.Tab.0.center" timestamp="1596662161977">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="283" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1596662161977" />
+    <state width="1899" height="283" key="GridCell.Tab.0.left" timestamp="1596662161977">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="283" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1596662161977" />
+    <state width="1899" height="283" key="GridCell.Tab.0.right" timestamp="1596662161977">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1899" height="283" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1596662161977" />
+    <state x="803" y="292" key="refactoring.ChangeSignatureDialog" timestamp="1596661782149">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="803" y="292" key="refactoring.ChangeSignatureDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1596661782149" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1596661354133">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1596661354133" />
   </component>
 </project>

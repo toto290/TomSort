@@ -1,18 +1,20 @@
 import tkinter as tk
+from tkinter import ttk
 import tkinter.filedialog
 import os
 import datetime
 from pathlib import Path
 from PIL import Image, ImageTk
+import sqlite3
 
 
-class MainApplication(tk.Tk):
+class TomSort(tk.Tk):
     def __init__(self, title):
         tk.Tk.__init__(self)
 
         # initial parameters
         self.mode = tk.IntVar()
-        self.mode.set(0)    # start:0 sort:1 twin:2
+        self.mode.set(1)    # start:0 sort:1 twin:2
         self.state('zoomed')
         self.update_idletasks()
         self.width = self.winfo_width()
@@ -24,9 +26,9 @@ class MainApplication(tk.Tk):
         # GUI creation
         self.menu = Menu(self)
         self.status = Status(self)
-        self.frame_start = FrameModeStart(self, width=self.width, height=self.height, bg=colourdict[3])
-        self.frame_sort = FrameModeSort(self, width=self.width, height=self.height, bg=colourdict[3])
-        self.frame_twin = FrameModeTwin(self, width=self.width, height=self.height, bg=colourdict[3])
+        self.frame_start = FrameModeStart(self, width=self.width, height=self.height, bg=colordict['background'])
+        self.frame_sort = FrameModeSort(self, width=self.width, height=self.height, bg=colordict['background'])
+        self.frame_twin = FrameModeTwin(self, width=self.width, height=self.height, bg=colordict['background'])
         self.mode_dict = {0: ('Start', self.frame_start), 1: ('Sort', self.frame_sort), 2: ('Twin', self.frame_twin)}
 
         # GUI initialization
@@ -40,6 +42,7 @@ class MainApplication(tk.Tk):
         self.bind('<Left>', lambda e: self.left_key())
         self.bind('<Right>', lambda e: self.right_key())
         self.bind('<Up>', lambda e: self.up_key())
+        self.bind('<Escape>', lambda e: self.cb_escape())
 
     def left_key(self):
         if self.currentframe == self.mode_dict[1][1]:
@@ -52,6 +55,9 @@ class MainApplication(tk.Tk):
     def up_key(self):
         if self.currentframe == self.mode_dict[1][1]:
             self.frame_sort.button_quickfuns_rotate_image()
+
+    def cb_escape(self):
+        self.destroy()
 
     def switch_mode(self, num):
         self.mode.set(num)
@@ -82,7 +88,7 @@ class FrameModeSort(tk.Frame):
         tk.Frame.__init__(self, root, **kwargs)
         self.root = root
 
-        self.validfiles = validphototypes
+        self.validfiles = valid_photo_types
         self.photos = []
 
         # GUI settings
@@ -95,7 +101,7 @@ class FrameModeSort(tk.Frame):
         self.gridcell_displayed_image = tk.Frame(self)
         self.gridcell_displayed_image.grid(row=0, column=0, rowspan=3, sticky='nsew')
         self.gridcell_displayed_image.configure(bg='white', bd=1, relief='solid')
-        self.frame_displayed_image = tk.Label(self.gridcell_displayed_image, bg=colourdict[1])
+        self.frame_displayed_image = tk.Label(self.gridcell_displayed_image, bg=colordict['widget_bg'])
         self.displayed_image = Photo(path_images, "girl_with_camera.png")
         self.frame_displayed_image.pack(fill='both', expand=1)
         self.set_displayed_image(self.displayed_image)
@@ -112,46 +118,45 @@ class FrameModeSort(tk.Frame):
 
         # area: workpath
         pad_wf = 20
-        self.gridcell_workpath = tk.Frame(self)
+        self.gridcell_workpath = tk.Frame(self, bg=colordict['widget_bg'])
         self.gridcell_workpath.grid(row=0, column=1, sticky='nwe', pady=pad_wf, padx=pad_wf)
         self.workfolder = Path("empty")
-        self.workpath_label = tk.Label(self.gridcell_workpath, text=self.workfolder, relief='sunken')
-        self.workpath_button = tk.Button(self.gridcell_workpath, text='change', relief="raised")
-        self.workpath_label.pack(side='left', expand=True)
-        self.workpath_button.pack(side='right')
+        self.workpath_label = tk.Label(self.gridcell_workpath, text=self.workfolder, bg=colordict['widget_bg']
+                                       , fg=colordict['font'])
+        self.workpath_label.grid(column=0, row=0, sticky='EW')
+        self.workpath_button = tk.Button(self.gridcell_workpath, text='change', relief="raised",
+                                         bg=colordict['widget_fg'], fg=colordict['font'])
+        self.workpath_button.grid(column=1, row=0)
+        self.gridcell_workpath.columnconfigure(0, weight=1)
         self.workpath_button.bind('<Button-1>', lambda e: self.button_set_workpath())
         self.workpath_label.configure(text=str(self.workfolder))
 
         # area: metadata
         pad_md = 20
-        self.gridcell_metadata = tk.Frame(self, pady=pad_md, padx=pad_md, bg=colourdict[3])
+        self.gridcell_metadata = tk.Frame(self, pady=pad_md, padx=pad_md, bg=colordict['background'])
         self.gridcell_metadata.grid(row=1, column=1, sticky="nesw")
-        self.frame_metadata = tk.Frame(self.gridcell_metadata)
+        self.frame_metadata = tk.Frame(self.gridcell_metadata, bg=colordict['widget_bg'])
 
-        self.metadata_dict = {'oldname': ([0, 'old name', None]),
-                              'newname': ([1, 'new name', None]),
-                              'date': ([2, 'date', None]),
-                              'reso': ([3, 'resolution', None])}
+        self.metadata_dict = {'oldname': [0, 'old name'],
+                              'newname': [1, 'new name'],
+                              'date': [2, 'date'],
+                              'reso': [3, 'resolution']}
 
-        for md_key in self.metadata_dict.keys():
-            self.metadata_dict[md_key][2] = self.prepare_metadata_element(self.metadata_dict[md_key])
+        for md_key in list(self.metadata_dict.keys()):
+            self.metadata_dict[md_key].append(self.prepare_metadata_element(self.metadata_dict[md_key]))
 
-        #self.label_identifier_oldname, self.label_content_oldname = self.prepare_metadata_element(0, "old name")
-        #self.label_identifier_newname, self.label_content_newname = self.prepare_metadata_element(1, "newname")
-        #self.label_identifier_date, self.label_content_date = self.prepare_metadata_element(2, "date")
-        #self.label_identifier_reso, self.label_content_reso = self.prepare_metadata_element(3, "resolution")
-        #self.label_identifier_test, self.label_content_test = self.prepare_metadata_element(4, "xxx")
         self.frame_metadata.columnconfigure(1, weight=5)
         self.frame_metadata.pack(fill="both", expand=True, side="left")
 
         # area: tags
-        self.gridcell_tags = tk.Frame(self)
-        self.gridcell_tags.grid(row=2, column=1)
+        self.gridcell_tags = tk.Frame(self, pady=pad_md, padx=pad_md, bg=colordict['background'])
+        self.gridcell_tags.grid(row=2, column=1, sticky='ew')
+        ttk.Combobox(self.gridcell_tags).grid(column=0, row=0, columnspan=2, sticky='ew')
 
     def prepare_quickfun_element(self, col, txt, fun):
         button_width = 20
-        button_color = colourdict[1]
-        font_color = colourdict[6]
+        button_color = colordict['widget_fg']
+        font_color = colordict['font']
         font_size = 8
         button = tk.Button(self.gridcell_quickfuns, width=button_width, text=txt)
         button.configure(bg=button_color, fg=font_color, font=font_size)
@@ -160,13 +165,11 @@ class FrameModeSort(tk.Frame):
         return button
 
     def prepare_metadata_element(self, md_info):
-        button_color = colourdict[1]
-        font_color = colourdict[6]
         row = md_info[0]
         txt = md_info[1]
-        ident = tk.Label(self.frame_metadata, text=txt, bg=button_color, fg=font_color, relief='groove')
+        ident = tk.Label(self.frame_metadata, text=txt, bg=colordict['widget_fg'], fg=colordict['font'])
         ident.grid(row=row, column=0, sticky="we")
-        cont = tk.Label(self.frame_metadata, relief='groove', text='empty', bg=button_color, fg=font_color)
+        cont = tk.Label(self.frame_metadata, text='empty', bg=colordict['widget_bg'], fg=colordict['font'])
         cont.grid(row=row, column=1, sticky="we")
         return [ident, cont]
 
@@ -290,21 +293,19 @@ def get_resized_image(image, widget):
     return img
 
 
+def debug(obj_in):
+    print('DEBUG > ' + str(obj_in))
+
+
 # ===== Global Vars =====
-colourdict = {0: '#FFFFFF', 1: '#354668', 2: '#27334A', 3: '#1C2536', 4: '#121926', 5: '#0B0F17', 6: '#F48211'}
-validphototypes = ['.jpg', '.JPG', '.png', '.PNG']
+colordict = {'background': '#121212',
+             'widget_bg': '#1f2933',
+             'font': '#ffffff',
+             'widget_fg': '#323f4b'}
+valid_photo_types = ['.jpg', '.JPG', '.png', '.PNG']
 path_images = Path(r"C:\Users\tomod\OneDrive\06 Programmierung\01 Python\01 Projekte\TomSort\images")
 
 # ===== Program =====
 if __name__ == '__main__':
-    app = MainApplication('TomSort')
+    app = TomSort('TomSort')
     app.mainloop()
-
-'''
-workfolder = Path("C:/Users/tomod/Desktop/FotoSortTest")
-
-filesInFolder = os.listdir(workfolder)
-print(len(filesInFolder))
-f = open(workfolder / Path(filesInFolder[2]))
-print(f)
-'''
